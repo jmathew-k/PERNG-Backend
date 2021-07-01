@@ -30,7 +30,8 @@ module.exports = {
 				if (confirmPassword.trim() === '')
 					errors.confirmPassword = 'Confirm Password must not be empty'
 
-				if(password !== confirmPassword) errors.confirmPassword = 'password must match'
+				if (password !== confirmPassword)
+					errors.confirmPassword = 'password must match'
 
 				//Check if username / email exits
 				const userByUsername = await User.findOne({ where: { username } })
@@ -57,6 +58,13 @@ module.exports = {
 				return user
 			} catch (err) {
 				console.log(err)
+				if (err.name === 'SequelizeUniqueConstraintError') {
+					err.errors.forEach(
+						(e) => (errors[e.path] = `${e.path} is already taken`)
+					)
+				} else if (err.name === 'SequelizeValidationError') {
+					err.errors.forEach((e) => (errors[e.path] = e.message))
+				}
 				throw new UserInputError('Bad input', { errors: err })
 			}
 		},
