@@ -9,7 +9,6 @@ module.exports = {
 		getUsers: async () => {
 			try {
 				const users = await User.findAll()
-
 				return users
 			} catch (err) {
 				console.log(err)
@@ -22,31 +21,44 @@ module.exports = {
 			let errors = {}
 
 			try {
-				// TODO: Validate input data
-				if(email.trim() === '') errors.email = 'Email must not be empty'
-				if(username.trim() === '') errors.username = 'Username must not be empty'
-				if(password.trim() === '') errors.password = 'Password must not be empty'
-				if(confirmPassword.trim() === '') errors.confirmPassword = 'Repeat Password must not be empty'
+				//Validate input data
+				if (email.trim() === '') errors.email = 'Email must not be empty'
+				if (username.trim() === '')
+					errors.username = 'Username must not be empty'
+				if (password.trim() === '')
+					errors.password = 'Password must not be empty'
+				if (confirmPassword.trim() === '')
+					errors.confirmPassword = 'Confirm Password must not be empty'
 
-				// TODO: Check if username / email exits
-				const userByUsername = await User.findOne({ where: { username }})
-				const userByEmail = await User.findOne({ where: { email }})
+				if(password !== confirmPassword) errors.confirmPassword = 'password must match'
 
-				if(userByUsername) errors
+				//Check if username / email exits
+				const userByUsername = await User.findOne({ where: { username } })
+				const userByEmail = await User.findOne({ where: { email } })
+
+				if (userByUsername) errors.username = 'Username is taken'
+				if (userByEmail) errors.email = 'Email is taken'
+
+				if (Object.keys(errors).length > 0) {
+					throw errors
+				}
 
 				//Hash password
-				password = await bcrypt.hash(password, 6)
+				password = await bcrypt.hash(password, 10)
 
 				//Create user
 				const user = await User.create({
-					username, email, password
+					username,
+					email,
+					password,
 				})
-				return user
 
-			} catch(err) {
+				//Return user
+				return user
+			} catch (err) {
 				console.log(err)
-				throw err
+				throw new UserInputError('Bad input', { errors: err })
 			}
-		}
-	}
+		},
+	},
 }
