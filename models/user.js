@@ -23,8 +23,10 @@ module.exports = (sequelize, DataTypes) => {
 				allowNull: false,
 				unique: true,
 				validate: {
-					isEmail: true,
-					msg: 'must be a valid email address',
+					isEmail: {
+						args: true,
+						msg: 'must be a valid email address',
+					},
 				},
 			},
 			password: {
@@ -39,5 +41,6 @@ module.exports = (sequelize, DataTypes) => {
 			tableName: 'users',
 		}
 	)
+
 	return User
 }
