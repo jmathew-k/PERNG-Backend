@@ -61,7 +61,7 @@ module.exports = {
 				if (err.name === 'SequelizeUniqueConstraintError') {
 					err.errors.forEach(
 						(e) => (errors[e.path] = `${e.path} is already taken`)
-					)
+					) 
 				} else if (err.name === 'SequelizeValidationError') {
 					err.errors.forEach((e) => (errors[e.path] = e.message))
 				}
